@@ -1,3 +1,6 @@
+#pragma once
+
+
 /**
  * Find a path from the given start position to the given target.
  *
