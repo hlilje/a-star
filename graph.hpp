@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-
 
 struct Node {
     const int nX, nY;

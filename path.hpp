@@ -1,5 +1,14 @@
 #pragma once
 
+#include "graph.hpp"
+#include <set>
+
+
+void CreateNodes(const unsigned char* pMap, const int nMapWidth,
+                 const int nMapHeight, const int nStartX, const int nStartY,
+                 const int nTargetX, const int nTargetY, Node** pNodes);
+
+void DeleteNodes(const int nNumNodes, Node** pNodes);
 
 /**
  * Find a path from the given start position to the given target.
