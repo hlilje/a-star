@@ -21,15 +21,16 @@ void CreateNodes(const unsigned char* pMap, const int nMapWidth,
                 nNode = pTarget;
             else
                 nNode = new Node(nX, nY);
-            pNodes[i][j] = nNode;
+            pNodes[nY][nX] = nNode;
         }
     }
 }
 
 void DeleteNodes(const int nMapWidth, const int nMapHeight, Node*** pNodes) {
     for (int i = 0; i < nMapHeight; ++i) {
-        for (int j = 0; j < nMapHeight; ++j)
+        for (int j = 0; j < nMapWidth; ++j) {
             delete pNodes[i][j];
+        }
         delete[] pNodes[i];
     }
     delete[] pNodes;
@@ -37,8 +38,8 @@ void DeleteNodes(const int nMapWidth, const int nMapHeight, Node*** pNodes) {
 
 int FindPath(const int nStartX, const int nStartY,
              const int nTargetX, const int nTargetY,
-             const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
-             int* pOutBuffer, const int nOutBufferSize) {
+             const unsigned char* pMap, const int nMapWidth,
+             const int nMapHeight, int* pOutBuffer, const int nOutBufferSize) {
     int size = nMapWidth * nMapHeight;
     Node*** pNodes = new Node**[nMapHeight];
     for (int i = 0; i < nMapHeight; ++i)
