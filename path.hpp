@@ -4,9 +4,15 @@
 #include <set>
 
 
-void CreateNodes(const unsigned char* pMap, const int nMapWidth,
-                 const int nMapHeight, const int nStartX, const int nStartY,
-                 const int nTargetX, const int nTargetY, Node*** pNodes);
+/**
+ * @return: Start and target node pair.
+ */
+std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
+                                    const int nMapWidth,
+                                    const int nMapHeight, const int nStartX,
+                                    const int nStartY,
+                                    const int nTargetX, const int nTargetY,
+                                    Node*** pNodes);
 
 void DeleteNodes(const int nMapWidth, const int nMapHeight, Node*** pNodes);
 

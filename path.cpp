@@ -2,9 +2,12 @@
 #include <iostream> // TODO: Remove
 
 
-void CreateNodes(const unsigned char* pMap, const int nMapWidth,
-                 const int nMapHeight, const int nStartX, const int nStartY,
-                 const int nTargetX, const int nTargetY, Node*** pNodes) {
+std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
+                                    const int nMapWidth,
+                                    const int nMapHeight, const int nStartX,
+                                    const int nStartY,
+                                    const int nTargetX, const int nTargetY,
+                                    Node*** pNodes) {
     int size = nMapWidth * nMapHeight;
     Node* pStart = new Node(nStartX, nStartY);
     Node* pTarget = new Node(nTargetX, nTargetY);
@@ -24,6 +27,8 @@ void CreateNodes(const unsigned char* pMap, const int nMapWidth,
             pNodes[nY][nX] = nNode;
         }
     }
+
+    return std::pair<Node*, Node*>(pStart, pTarget);
 }
 
 void DeleteNodes(const int nMapWidth, const int nMapHeight, Node*** pNodes) {
@@ -45,11 +50,14 @@ int FindPath(const int nStartX, const int nStartY,
     for (int i = 0; i < nMapHeight; ++i)
         pNodes[i] = new Node*[nMapWidth];
 
-    CreateNodes(pMap, nMapWidth, nMapHeight, nStartX, nStartY, nTargetX,
-                nTargetY, pNodes);
+    std::pair<Node*, Node*> pStartTarget = CreateNodes(pMap, nMapWidth,
+                                                       nMapHeight, nStartX,
+                                                       nStartY, nTargetX,
+                                                       nTargetY, pNodes);
 
-    std::set<Node*> sClosed; // Already evaluated nodes
-    std::set<Node*> sOpen;   // Tentative nodes
+    std::set<Node*> sClosed;          // Already evaluated nodes
+    std::set<Node*> sOpen;            // Tentative nodes
+    sOpen.insert(pStartTarget.first); // Start with start node
 
     DeleteNodes(nMapWidth, nMapHeight, pNodes);
 
