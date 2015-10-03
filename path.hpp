@@ -4,6 +4,9 @@
 #include <set>
 
 
+void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
+                       Node*** pNodes);
+
 /**
  * @return: Start and target node pair.
  */
