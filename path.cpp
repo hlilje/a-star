@@ -87,9 +87,9 @@ int FindPath(const int nStartX, const int nStartY,
     Node* pStart = pStartTarget.first;
     Node* pTarget = pStartTarget.second;
 
-    std::set<Node*> sClosed;                   // Already evaluated nodes
-    std::set<Node*> sOpen;                     // Tentative nodes
-    std::unordered_map<Node*, bool> mCameFrom; // Navigated nodes
+    std::set<Node*> sClosed;                    // Already evaluated nodes
+    std::set<Node*> sOpen;                      // Tentative nodes
+    std::unordered_map<Node*, Node*> mCameFrom; // Navigated nodes
     // Cost from start along best path
     std::unordered_map<Node*, int> mCostPath;
     // Estimated total cost from start to goal through y
@@ -105,6 +105,20 @@ int FindPath(const int nStartX, const int nStartY,
 }
 
 int Heuristic(const Node* pFrom, const Node* pTo) {
-    // Manhattan distance
     return std::abs(pFrom->nX - pTo->nX) + std::abs(pFrom->nY - pTo->nY);
+}
+
+std::vector<Node*> ReconstructPath(std::unordered_map<Node*, Node*>& mCameFrom,
+                                   Node* pStart, Node* pGoal) {
+    std::vector<Node*> vPath;
+    Node* pCurrent = pGoal;
+    vPath.push_back(pCurrent);
+
+    while (pCurrent != pStart) {
+        pCurrent = mCameFrom[pCurrent];
+        vPath.push_back(pCurrent);
+    }
+
+    std::reverse(vPath.begin(), vPath.end());
+    return vPath;
 }

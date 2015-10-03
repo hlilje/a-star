@@ -1,14 +1,20 @@
 #pragma once
 
 #include "graph.hpp"
+#include <algorithm>
 #include <set>
 #include <unordered_map>
 
 
+/**
+ * Connect all traversable nodes with their traversable neighbours.
+ */
 void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
                        Node*** pNodes);
 
 /**
+ * Create the initial nodes based on input originally given to `FindPath`.
+ *
  * @return: Start and target node pair.
  */
 std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
@@ -18,6 +24,9 @@ std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
                                     const int nTargetX, const int nTargetY,
                                     Node*** pNodes);
 
+/**
+ * Delete all the nodes.
+ */
 void DeleteNodes(const int nMapWidth, const int nMapHeight, Node*** pNodes);
 
 /**
@@ -46,4 +55,17 @@ int FindPath(const int nStartX, const int nStartY,
              const unsigned char* pMap, const int nMapWidth,
              const int nMapHeight, int* pOutBuffer, const int nOutBufferSize);
 
+/**
+ * Heuristic estimate for cost of distance between `pFrom` and `pTo`.
+ *
+ * @return: The Manhattan distance between the nodes.
+ */
 int Heuristic(const Node* pFrom, const Node* pTo);
+
+/**
+ * Reconstruct the taken path by backtracking.
+ *
+ * @return: The reconstructed path.
+ */
+std::vector<Node*> ReconstructPath(std::unordered_map<Node*, Node*>& mCameFrom,
+                                   Node* pStart, Node* pGoal);
