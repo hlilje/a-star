@@ -6,7 +6,9 @@ void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
                        Node*** pNodes) {
     for (int i = 0; i < nMapHeight; ++i) {
         for (int j = 0; j < nMapWidth; ++j) {
-            if (pNodes[i][j]->bBlocked) continue;
+            if (pNodes[i][j]->bBlocked) {
+                continue;
+            }
 
             if (i > 0) {
                 if (!pNodes[i - 1][j]->bBlocked)
@@ -40,16 +42,16 @@ std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
 
     for (int i = 0; i < nMapHeight; ++i) {
         int nStart = i * nMapWidth;
+        int nY = i;
         for (int j = nStart; j < nStart + nMapWidth; ++j) {
             int nX = j % nMapWidth;
-            int nY = i;
             Node* nNode;
             if ((nX == pStart->nX) && (nY == pStart->nY))
                 nNode = pStart;
             else if ((nX == pTarget->nX) && (nY  == pTarget->nY))
                 nNode = pTarget;
             else
-                nNode = new Node(nX, nY, pMap[j]);
+                nNode = new Node(nX, nY, !pMap[j]);
             pNodes[nY][nX] = nNode;
         }
     }
@@ -81,17 +83,6 @@ int FindPath(const int nStartX, const int nStartY,
                                                        nStartY, nTargetX,
                                                        nTargetY, pNodes);
     ConnectNeighbours(nMapWidth, nMapHeight, pNodes);
-
-    // TODO: Debug
-    for (int i = 0; i < nMapHeight; ++i) {
-        for (int j = 0; j < nMapWidth; ++j) {
-            std::cout << "Node: " << pNodes[i][j]->nX << " " << pNodes[i][j]->nY << std::endl;
-            std::cout << "Has edges:" << std::endl;
-            for (auto k : pNodes[i][j]->vEdges)
-                std::cout << k->nX << " " << k->nY << std::endl;
-            std::cout << "=====" << std::endl;
-        }
-    }
 
     std::set<Node*> sClosed;          // Already evaluated nodes
     std::set<Node*> sOpen;            // Tentative nodes
