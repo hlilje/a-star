@@ -84,11 +84,27 @@ int FindPath(const int nStartX, const int nStartY,
                                                        nTargetY, pNodes);
     ConnectNeighbours(nMapWidth, nMapHeight, pNodes);
 
-    std::set<Node*> sClosed;          // Already evaluated nodes
-    std::set<Node*> sOpen;            // Tentative nodes
-    sOpen.insert(pStartTarget.first); // Start with start node
+    Node* pStart = pStartTarget.first;
+    Node* pTarget = pStartTarget.second;
+
+    std::set<Node*> sClosed;                   // Already evaluated nodes
+    std::set<Node*> sOpen;                     // Tentative nodes
+    std::unordered_map<Node*, bool> mCameFrom; // Navigated nodes
+    // Cost from start along best path
+    std::unordered_map<Node*, int> mCostPath;
+    // Estimated total cost from start to goal through y
+    std::unordered_map<Node*, int> mCostTotal;
+
+    sOpen.insert(pStart);
+    mCostPath[pStart] = 0;
+    mCostTotal[pStart] = mCostPath[pStart] + Heuristic(pStart, pTarget);
 
     DeleteNodes(nMapWidth, nMapHeight, pNodes);
 
     return -1;
+}
+
+int Heuristic(const Node* pFrom, const Node* pTo) {
+    // Manhattan distance
+    return std::abs(pFrom->nX - pTo->nX) + std::abs(pFrom->nY - pTo->nY);
 }
