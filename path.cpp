@@ -88,14 +88,14 @@ int FindPath(const int nStartX, const int nStartY,
     Node* pTarget = pStartTarget.second;
 
     std::set<Node*> sClosed;                    // Already evaluated nodes
-    std::set<Node*> sOpen;                      // Tentative nodes
+    PriorityQueue<Node*> sOpen;                 // Tentative nodes
     std::unordered_map<Node*, Node*> mCameFrom; // Navigated nodes
     // Cost from start along best path
     std::unordered_map<Node*, int> mCostPath;
     // Estimated total cost from start to goal through y
     std::unordered_map<Node*, int> mCostTotal;
 
-    sOpen.insert(pStart);
+    sOpen.put(pStart, 0);
     mCostPath[pStart] = 0;
     mCostTotal[pStart] = mCostPath[pStart] + Heuristic(pStart, pTarget);
 
