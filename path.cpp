@@ -36,7 +36,6 @@ std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
                                     const int nStartY,
                                     const int nTargetX, const int nTargetY,
                                     Node*** pNodes) {
-    int size = nMapWidth * nMapHeight;
     Node* pStart = new Node(nStartX, nStartY, false);
     Node* pTarget = new Node(nTargetX, nTargetY, false);
 
@@ -73,7 +72,6 @@ int FindPath(const int nStartX, const int nStartY,
              const int nTargetX, const int nTargetY,
              const unsigned char* pMap, const int nMapWidth,
              const int nMapHeight, int* pOutBuffer, const int nOutBufferSize) {
-    int size = nMapWidth * nMapHeight;
     Node*** pNodes = new Node**[nMapHeight];
     for (int i = 0; i < nMapHeight; ++i)
         pNodes[i] = new Node*[nMapWidth];
@@ -88,20 +86,40 @@ int FindPath(const int nStartX, const int nStartY,
     Node* pTarget = pStartTarget.second;
 
     std::set<Node*> sClosed;                    // Already evaluated nodes
-    PriorityQueue<Node*> sOpen;                 // Tentative nodes
+    PriorityQueue<Node*> sFringe;               // Tentative nodes
     std::unordered_map<Node*, Node*> mCameFrom; // Navigated nodes
-    // Cost from start along best path
-    std::unordered_map<Node*, int> mCostPath;
-    // Estimated total cost from start to goal through y
-    std::unordered_map<Node*, int> mCostTotal;
+    std::unordered_map<Node*, int> mCost;       // Cost so far
 
-    sOpen.put(pStart, 0);
-    mCostPath[pStart] = 0;
-    mCostTotal[pStart] = mCostPath[pStart] + Heuristic(pStart, pTarget);
+    sFringe.put(pStart, 0);
+    mCost[pStart] = 0;
+
+    while (!sFringe.empty()) {
+        Node* pCurrent = sFringe.get();
+
+        if (pCurrent == pTarget) break;
+
+        for (Node* pNext : pCurrent->vEdges) {
+            // Distance to neighbours always 1
+            int nNewScore = mCost[pCurrent] + 1;
+            if (!mCost.count(pNext) || nNewScore < mCost[pNext]) {
+                mCost[pNext] = nNewScore;
+                int nPriority = nNewScore + Heuristic(pNext, pTarget);
+                sFringe.put(pNext, nPriority);
+                mCameFrom[pNext] = pCurrent;
+            }
+        }
+    }
+
+    // TODO: Store in buffer
+    std::vector<Node*> vPath = ReconstructPath(mCameFrom, pStart, pTarget);
+    std::cout << "SIZE: " << vPath.size() << std::endl;
+    for (auto i : vPath)
+        std::cout << i->nX << " " << i->nY << std::endl;
 
     DeleteNodes(nMapWidth, nMapHeight, pNodes);
 
-    return -1;
+    return vPath.size() - 1; // Excluding start node
+    /* return -1; */
 }
 
 int Heuristic(const Node* pFrom, const Node* pTo) {
@@ -109,9 +127,9 @@ int Heuristic(const Node* pFrom, const Node* pTo) {
 }
 
 std::vector<Node*> ReconstructPath(std::unordered_map<Node*, Node*>& mCameFrom,
-                                   Node* pStart, Node* pGoal) {
+                                   Node* pStart, Node* pTarget) {
     std::vector<Node*> vPath;
-    Node* pCurrent = pGoal;
+    Node* pCurrent = pTarget;
     vPath.push_back(pCurrent);
 
     while (pCurrent != pStart) {
