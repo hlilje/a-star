@@ -9,8 +9,8 @@ void TestValidPath() {
     assert(nRes == 3);
 
     assert(pOutBuffer[0] == 1);
-    assert(pOutBuffer[0] == 5);
-    assert(pOutBuffer[0] == 9);
+    assert(pOutBuffer[1] == 5);
+    assert(pOutBuffer[2] == 9);
 }
 
 void TestInvalidPath() {

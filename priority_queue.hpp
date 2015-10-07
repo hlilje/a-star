@@ -13,19 +13,19 @@ class PriorityQueue {
                             std::greater<PQElement>> pElements;
 
     public:
-        /**
+        /*
          * @return: true if the queue is empty.
          */
         bool empty();
 
-        /**
+        /*
          * Get and pop the top element in the queue.
          *
          * @return: The top element in the queue.
          */
         T get();
 
-        /**
+        /*
          * @param tItem:     The item to put in the queue.
          * @param nPriority: The item's priority.
          */

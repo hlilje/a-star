@@ -5,7 +5,15 @@
 #include <algorithm>
 #include <set>
 #include <unordered_map>
+#include <vector>
 
+
+/*
+ * Fill the output buffer with path indices as they appear in `pMap`,
+ * excluding the start position.
+ */
+void BuildOutputBuffer(const int nMapWidth, int* pOutBuffer,
+                       const std::vector<Node*>& vPath);
 
 /*
  * Connect all traversable nodes with their traversable neighbours.
@@ -32,7 +40,8 @@ void DeleteNodes(const int nMapWidth, const int nMapHeight, Node*** pNodes);
 
 /*
  * Find a path from the given start position to the given target using A*
- * search.
+ * search. If the resulting path is longer than the output buffer, it is
+ * considered a failure.
  *
  * @param nStartX, nStartY:      0-based coordinates of the start position.
  * @param nTargetX, nTargetY:    0-based coordinates of the target position.

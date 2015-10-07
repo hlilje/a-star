@@ -1,6 +1,14 @@
 #include "path.hpp"
-#include <iostream> // TODO: Remove
 
+
+void BuildOutputBuffer(const int nMapWidth, int* pOutBuffer,
+                       const std::vector<Node*>& vPath) {
+    // Start node not part of resulting path
+    for (int i = 1; i < (int) vPath.size(); ++i) {
+        Node* pNode = vPath[i];
+        pOutBuffer[i - 1] = (pNode->nY * nMapWidth) + pNode->nX;
+    }
+}
 
 void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
                        Node*** pNodes) {
@@ -85,7 +93,6 @@ int FindPath(const int nStartX, const int nStartY,
     Node* pStart = pStartTarget.first;
     Node* pTarget = pStartTarget.second;
 
-    std::set<Node*> sClosed;                    // Already evaluated nodes
     PriorityQueue<Node*> sFringe;               // Tentative nodes
     std::unordered_map<Node*, Node*> mCameFrom; // Navigated nodes
     std::unordered_map<Node*, int> mCost;       // Cost so far
@@ -93,33 +100,36 @@ int FindPath(const int nStartX, const int nStartY,
     sFringe.put(pStart, 0);
     mCost[pStart] = 0;
 
+    bool found = false;
     while (!sFringe.empty()) {
-        Node* pCurrent = sFringe.get();
+        Node* pCurrent = sFringe.get(); // Node with lowest cost
 
-        if (pCurrent == pTarget) break;
+        if (pCurrent == pTarget) {
+            found = true;
+            break;
+        }
 
         for (Node* pNext : pCurrent->vEdges) {
             // Distance to neighbours always 1
             int nNewScore = mCost[pCurrent] + 1;
             if (!mCost.count(pNext) || nNewScore < mCost[pNext]) {
-                mCost[pNext] = nNewScore;
                 int nPriority = nNewScore + Heuristic(pNext, pTarget);
+                mCost[pNext] = nNewScore;
                 sFringe.put(pNext, nPriority);
                 mCameFrom[pNext] = pCurrent;
             }
         }
     }
 
-    // TODO: Store in buffer
+    if (!found) return -1;
+
     std::vector<Node*> vPath = ReconstructPath(mCameFrom, pStart, pTarget);
-    std::cout << "SIZE: " << vPath.size() << std::endl;
-    for (auto i : vPath)
-        std::cout << i->nX << " " << i->nY << std::endl;
+    if ((int) vPath.size() - 1 > nOutBufferSize) return -1;
+    BuildOutputBuffer(nMapWidth, pOutBuffer, vPath);
 
     DeleteNodes(nMapWidth, nMapHeight, pNodes);
 
     return vPath.size() - 1; // Excluding start node
-    /* return -1; */
 }
 
 int Heuristic(const Node* pFrom, const Node* pTo) {
