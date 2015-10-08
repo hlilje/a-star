@@ -115,12 +115,18 @@ int FindPath(const int nStartX, const int nStartY,
         }
     }
 
-    if (!found) return -1;
+    if (!found) {
+        DeleteNodes(nMapWidth, nMapHeight, pNodes);
+        return -1;
+    }
 
     std::vector<Node*> vPath = ReconstructPath(mCameFrom, pStart, pTarget);
-    if ((int) vPath.size() - 1 > nOutBufferSize) return -1;
-    BuildOutputBuffer(nMapWidth, pOutBuffer, vPath);
+    if ((int) vPath.size() - 1 > nOutBufferSize) {
+        DeleteNodes(nMapWidth, nMapHeight, pNodes);
+        return -1;
+    }
 
+    BuildOutputBuffer(nMapWidth, pOutBuffer, vPath);
     DeleteNodes(nMapWidth, nMapHeight, pNodes);
 
     return vPath.size() - 1; // Excluding start node
