@@ -18,8 +18,8 @@ void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
                 continue;
             }
 
+            int mod[8] = {-1, 0, 1, 0, 0, -1, 0, 1}; // (x, y) pairs
             for (int k = 0; k < 8; k += 2) {
-                int mod[8] = {-1, 0, 1, 0, 0, -1, 0, 1}; // (x, y) pairs
                 int new_x = j + mod[k];
                 int new_y = i + mod[k + 1];
                 if ((new_x >= 0) && (new_x < nMapWidth) && (new_y >= 0) &&
