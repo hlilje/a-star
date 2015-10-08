@@ -18,21 +18,15 @@ void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
                 continue;
             }
 
-            if (i > 0) {
-                if (!pNodes[i - 1][j]->bBlocked)
-                    pNodes[i][j]->vEdges.push_back(pNodes[i - 1][j]);
-            }
-            if (i < nMapHeight - 1) {
-                if (!pNodes[i + 1][j]->bBlocked)
-                    pNodes[i][j]->vEdges.push_back(pNodes[i + 1][j]);
-            }
-            if (j > 0) {
-                if (!pNodes[i][j - 1]->bBlocked)
-                    pNodes[i][j]->vEdges.push_back(pNodes[i][j - 1]);
-            }
-            if (j < nMapWidth - 1) {
-                if (!pNodes[i][j + 1]->bBlocked)
-                    pNodes[i][j]->vEdges.push_back(pNodes[i][j + 1]);
+            for (int k = 0; k < 8; k += 2) {
+                int mod[8] = {-1, 0, 1, 0, 0, -1, 0, 1}; // (x, y) pairs
+                int new_x = j + mod[k];
+                int new_y = i + mod[k + 1];
+                if ((new_x >= 0) && (new_x < nMapWidth) && (new_y >= 0) &&
+                    (new_y < nMapHeight)) {
+                    if (!pNodes[new_y][new_x]->bBlocked)
+                        pNodes[i][j]->vEdges.push_back(pNodes[new_y][new_x]);
+                }
             }
         }
     }
