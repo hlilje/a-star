@@ -13,6 +13,21 @@ void TestInvalidPath() {
     assert(nRes == -1);
 }
 
+void TestInvalidLongPath() {
+    unsigned char pMap[] = {
+        1, 0, 0, 1, 1, 1,
+        1, 0, 1, 1, 1, 1,
+        1, 0, 0, 1, 1, 0,
+        1, 0, 1, 1, 0, 1,
+        1, 1, 1, 0, 1, 1,
+        0, 0, 0, 0, 0, 1
+    };
+    int pOutBuffer[100];
+
+    int nRes = FindPath(0, 0, 5, 5, pMap, 6, 6, pOutBuffer, 100);
+    assert(nRes == -1);
+}
+
 void TestValidPath() {
     unsigned char pMap[] = {
         1, 1, 1, 1,

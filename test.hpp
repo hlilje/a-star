@@ -10,6 +10,11 @@
 void TestInvalidPath();
 
 /*
+ * Test a larger instance of an invalid path.
+ */
+void TestInvalidLongPath();
+
+/*
  * Test a small instance of a valid path.
  */
 void TestValidPath();

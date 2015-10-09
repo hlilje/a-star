@@ -3,6 +3,7 @@
 
 int main() {
     TestInvalidPath();
+    TestInvalidLongPath();
     TestValidPath();
     TestValidLongPath();
 
