@@ -2,8 +2,9 @@
 
 
 int main() {
-    TestValidPath();
     TestInvalidPath();
+    TestValidPath();
+    TestValidLongPath();
 
     return 0;
 }

@@ -5,11 +5,16 @@
 
 
 /*
+ * Test a small instance of an invalid path.
+ */
+void TestInvalidPath();
+
+/*
  * Test a small instance of a valid path.
  */
 void TestValidPath();
 
 /*
- * Test a small instance of an invalid path.
+ * Test a larger instance of a valid path.
  */
-void TestInvalidPath();
+void TestValidLongPath();
