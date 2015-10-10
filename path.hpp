@@ -45,7 +45,8 @@ int FindPath(const int nStartX, const int nStartY,
  *
  * @return: The Manhattan distance between the nodes.
  */
-int Heuristic(const int nFrom, const int nTo, const int nMapWidth);
+int Heuristic(const int nFromX, const int nFromY, const int nToX,
+              const int nToY);
 
 /*
  * Convert the given node index to coordinates on the map.

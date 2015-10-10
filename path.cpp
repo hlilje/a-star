@@ -47,8 +47,8 @@ int FindPath(const int nStartX, const int nStartY,
                 int nNewScore = mCost[nCurrent] + 1;
                 if (!mCost.count(nNeighbour) ||
                     nNewScore < mCost[nNeighbour]) {
-                    int nPriority = nNewScore + Heuristic(nNeighbour, nTarget,
-                                                          nMapWidth);
+                    int nPriority = nNewScore +
+                                    Heuristic(nNewX, nNewY, nTargetX, nTargetY);
                     mCost[nNeighbour] = nNewScore;
                     sFringe.put(nNeighbour, nPriority);
                     mCameFrom[nNeighbour] = nCurrent;
@@ -63,11 +63,9 @@ int FindPath(const int nStartX, const int nStartY,
                            mCameFrom);
 }
 
-int Heuristic(const int nFrom, const int nTo, const int nMapWidth) {
-    Node nFromNode = NodeToCoord(nFrom, nMapWidth);
-    Node nToNode = NodeToCoord(nTo, nMapWidth);
-    return std::abs(nFromNode.first - nToNode.first) +
-                    std::abs(nFromNode.second - nToNode.second);
+int Heuristic(const int nFromX, const int nFromY, const int nToX,
+              const int nToY) {
+    return std::abs(nFromX - nToX) + std::abs(nFromY - nToY);
 }
 
 Node NodeToCoord(const int nNode, const int nMapWidth) {
