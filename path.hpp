@@ -18,7 +18,7 @@ void BuildOutputBuffer(const int nMapWidth, int* pOutBuffer,
  * Connect all traversable nodes with their traversable neighbours.
  */
 void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
-                       Node*** pNodes);
+                       std::vector<std::vector<Node*>>& vNodes);
 
 /*
  * Create the initial nodes based on input originally given to `FindPath`.
@@ -30,12 +30,13 @@ std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
                                     const int nMapHeight, const int nStartX,
                                     const int nStartY,
                                     const int nTargetX, const int nTargetY,
-                                    Node*** pNodes);
+                                    std::vector<std::vector<Node*>>& vNodes);
 
 /*
  * Delete all the nodes.
  */
-void DeleteNodes(const int nMapWidth, const int nMapHeight, Node*** pNodes);
+void DeleteNodes(const int nMapWidth, const int nMapHeight,
+                 std::vector<std::vector<Node*>>& vNodes);
 
 /*
  * Find a path from the given start position to the given target using A*

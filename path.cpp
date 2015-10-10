@@ -11,10 +11,10 @@ void BuildOutputBuffer(const int nMapWidth, int* pOutBuffer,
 }
 
 void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
-                       Node*** pNodes) {
+                       std::vector<std::vector<Node*>>& vNodes) {
     for (int i = 0; i < nMapHeight; ++i) {
         for (int j = 0; j < nMapWidth; ++j) {
-            if (pNodes[i][j]->bBlocked) {
+            if (vNodes[i][j]->bBlocked) {
                 continue;
             }
 
@@ -24,8 +24,8 @@ void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
                 int new_y = i + mod[k + 1];
                 if ((new_x >= 0) && (new_x < nMapWidth) && (new_y >= 0) &&
                     (new_y < nMapHeight)) {
-                    if (!pNodes[new_y][new_x]->bBlocked)
-                        pNodes[i][j]->vEdges.push_back(pNodes[new_y][new_x]);
+                    if (!vNodes[new_y][new_x]->bBlocked)
+                        vNodes[i][j]->vEdges.push_back(vNodes[new_y][new_x]);
                 }
             }
         }
@@ -37,7 +37,7 @@ std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
                                     const int nMapHeight, const int nStartX,
                                     const int nStartY,
                                     const int nTargetX, const int nTargetY,
-                                    Node*** pNodes) {
+                                    std::vector<std::vector<Node*>>& vNodes) {
     Node* pStart = new Node(nStartX, nStartY, false);
     Node* pTarget = new Node(nTargetX, nTargetY, false);
 
@@ -53,36 +53,34 @@ std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
                 nNode = pTarget;
             else
                 nNode = new Node(nX, nY, !pMap[j]);
-            pNodes[nY][nX] = nNode;
+            vNodes[nY][nX] = nNode;
         }
     }
 
     return std::pair<Node*, Node*>(pStart, pTarget);
 }
 
-void DeleteNodes(const int nMapWidth, const int nMapHeight, Node*** pNodes) {
+void DeleteNodes(const int nMapWidth, const int nMapHeight,
+                 std::vector<std::vector<Node*>>& vNodes) {
     for (int i = 0; i < nMapHeight; ++i) {
         for (int j = 0; j < nMapWidth; ++j) {
-            delete pNodes[i][j];
+            delete vNodes[i][j];
         }
-        delete[] pNodes[i];
     }
-    delete[] pNodes;
 }
 
 int FindPath(const int nStartX, const int nStartY,
              const int nTargetX, const int nTargetY,
              const unsigned char* pMap, const int nMapWidth,
              const int nMapHeight, int* pOutBuffer, const int nOutBufferSize) {
-    Node*** pNodes = new Node**[nMapHeight];
-    for (int i = 0; i < nMapHeight; ++i)
-        pNodes[i] = new Node*[nMapWidth];
+    std::vector<std::vector<Node*>> vNodes(nMapHeight,
+                                           std::vector<Node*>(nMapWidth));
 
     std::pair<Node*, Node*> pStartTarget = CreateNodes(pMap, nMapWidth,
                                                        nMapHeight, nStartX,
                                                        nStartY, nTargetX,
-                                                       nTargetY, pNodes);
-    ConnectNeighbours(nMapWidth, nMapHeight, pNodes);
+                                                       nTargetY, vNodes);
+    ConnectNeighbours(nMapWidth, nMapHeight, vNodes);
 
     Node* pStart = pStartTarget.first;
     Node* pTarget = pStartTarget.second;
@@ -116,18 +114,18 @@ int FindPath(const int nStartX, const int nStartY,
     }
 
     if (!found) {
-        DeleteNodes(nMapWidth, nMapHeight, pNodes);
+        DeleteNodes(nMapWidth, nMapHeight, vNodes);
         return -1;
     }
 
     std::vector<Node*> vPath = ReconstructPath(mCameFrom, pStart, pTarget);
     if ((int) vPath.size() - 1 > nOutBufferSize) {
-        DeleteNodes(nMapWidth, nMapHeight, pNodes);
+        DeleteNodes(nMapWidth, nMapHeight, vNodes);
         return -1;
     }
 
     BuildOutputBuffer(nMapWidth, pOutBuffer, vPath);
-    DeleteNodes(nMapWidth, nMapHeight, pNodes);
+    DeleteNodes(nMapWidth, nMapHeight, vNodes);
 
     return vPath.size() - 1; // Excluding start node
 }
