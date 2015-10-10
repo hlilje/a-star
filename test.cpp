@@ -1,6 +1,20 @@
 #include "test.hpp"
 
 
+void TestEdgeCases() {
+    unsigned char pMap[] = {1};
+    int pOutBuffer[10];
+
+    int nRes = FindPath(0, 0, 0, 0, pMap, 1, 1, pOutBuffer, 10);
+    assert(nRes == -1);
+
+    unsigned char pMap2[] = {1, 1, 1, 1, 1, 1};
+    int pOutBuffer2[1];
+
+    nRes = FindPath(0, 0, 2, 1, pMap2, 3, 2, pOutBuffer2, 0);
+    assert(nRes == -1);
+}
+
 void TestInvalidPath() {
     unsigned char pMap[] = {
         0, 0, 1,

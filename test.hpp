@@ -5,6 +5,11 @@
 
 
 /*
+ * Test various small edge cases.
+ */
+void TestEdgeCases();
+
+/*
  * Test a small instance of an invalid path.
  */
 void TestInvalidPath();
