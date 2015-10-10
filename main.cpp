@@ -3,7 +3,6 @@
 
 int main() {
     TestEdgeCases();
-    return 0;
     TestInvalidPath();
     TestInvalidLongPath();
     TestValidPath();
