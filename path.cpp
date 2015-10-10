@@ -1,12 +1,12 @@
 #include "path.hpp"
 
-typedef std::pair<int, int> Node;
+using Node = std::pair<int, int>;
 
 
 void BuildOutputBuffer(int* pOutBuffer, const std::vector<int>& vPath) {
-    // Start node not part of resulting path
-    for (std::size_t i = 1; i < vPath.size(); ++i)
-        pOutBuffer[i - 1] = vPath[i];
+    // Start node not part of resulting path, path is reversed
+    for (int i = vPath.size() - 2, j = 0; i >= 0; --i, ++j)
+        pOutBuffer[j] = vPath[i];
 }
 
 int CoordToNode(const int nX, const int nY, const int nMapWidth) {
@@ -96,6 +96,5 @@ std::vector<int> ReconstructPath(std::unordered_map<int, int>& mCameFrom,
         vPath.push_back(nCurrent);
     }
 
-    std::reverse(vPath.begin(), vPath.end());
     return vPath;
 }

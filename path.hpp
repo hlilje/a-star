@@ -1,7 +1,6 @@
 #pragma once
 
 #include "priority_queue.hpp"
-#include <algorithm>
 #include <unordered_map>
 #include <vector>
 
@@ -63,7 +62,7 @@ std::pair<int, int> NodeToCoord(const int nNode, const int nMapWidth);
 /*
  * Reconstruct the taken path by backtracking.
  *
- * @return: The reconstructed path.
+ * @return: The reconstructed path in reverse.
  */
 std::vector<int> ReconstructPath(std::unordered_map<int, int>& mCameFrom,
                                  const int nStart, const int nTarget);
