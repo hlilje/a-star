@@ -6,11 +6,6 @@
 
 
 /*
- * Build the output buffer from the given `vPath` as per specifications.
- */
-void BuildOutputBuffer(int* pOutBuffer, const std::vector<int>& vPath);
-
-/*
  * Convert (0-based) map coordinates to the corresponing array node index.
  *
  * @return The corresponding index in `pMap`.
@@ -60,9 +55,12 @@ int Heuristic(const int nFrom, const int nTo, const int nMapWidth);
 std::pair<int, int> NodeToCoord(const int nNode, const int nMapWidth);
 
 /*
- * Reconstruct the taken path by backtracking.
+ * Reconstruct the taken path by backtracking and storing it in `pOutBuffer`.
  *
- * @return: The reconstructed path in reverse.
+ * @return: The length of the taken path (excluding start node and including
+ *          target node). If the path does not fit in `pOutBuffer`, -1 is
+ *          returned.
  */
-std::vector<int> ReconstructPath(std::unordered_map<int, int>& mCameFrom,
-                                 const int nStart, const int nTarget);
+int ReconstructPath(const int nStart, const int nTarget,
+                    const int nOutBufferSize, int* pOutBuffer,
+                    std::unordered_map<int, int>& mCameFrom);

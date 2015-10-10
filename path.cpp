@@ -3,12 +3,6 @@
 using Node = std::pair<int, int>;
 
 
-void BuildOutputBuffer(int* pOutBuffer, const std::vector<int>& vPath) {
-    // Start node not part of resulting path, path is reversed
-    for (int i = vPath.size() - 2, j = 0; i >= 0; --i, ++j)
-        pOutBuffer[j] = vPath[i];
-}
-
 int CoordToNode(const int nX, const int nY, const int nMapWidth) {
     return nY * nMapWidth + nX;
 }
@@ -33,7 +27,6 @@ int FindPath(const int nStartX, const int nStartY,
     bool found = false;
     int mod[8] = {-1, 0, 1, 0, 0, -1, 0, 1}; // (x, y) pairs
     while (!sFringe.empty()) {
-        // TODO: Avoid unnecessary coordinates/index conversions
         int nCurrent = sFringe.get(); // Node with lowest cost
         Node nCurrentNode = NodeToCoord(nCurrent, nMapWidth);
 
@@ -66,12 +59,8 @@ int FindPath(const int nStartX, const int nStartY,
 
     if (!found) return -1;
 
-    std::vector<int> vPath = ReconstructPath(mCameFrom, nStart, nTarget);
-    if ((int) vPath.size() - 1 > nOutBufferSize) return -1;
-
-    BuildOutputBuffer(pOutBuffer, vPath);
-
-    return vPath.size() - 1; // Excluding start node
+    return ReconstructPath(nStart, nTarget, nOutBufferSize, pOutBuffer,
+                           mCameFrom);
 }
 
 int Heuristic(const int nFrom, const int nTo, const int nMapWidth) {
@@ -85,8 +74,9 @@ Node NodeToCoord(const int nNode, const int nMapWidth) {
     return Node(nNode % nMapWidth, nNode / nMapWidth);
 }
 
-std::vector<int> ReconstructPath(std::unordered_map<int, int>& mCameFrom,
-                                 const int nStart, const int nTarget) {
+int ReconstructPath(const int nStart, const int nTarget,
+                    const int nOutBufferSize, int* pOutBuffer,
+                    std::unordered_map<int, int>& mCameFrom) {
     std::vector<int> vPath;
     int nCurrent = nTarget;
     vPath.push_back(nCurrent);
@@ -96,5 +86,12 @@ std::vector<int> ReconstructPath(std::unordered_map<int, int>& mCameFrom,
         vPath.push_back(nCurrent);
     }
 
-    return vPath;
+    int nPathLength = vPath.size() - 1; // Excluding start node
+    if (nPathLength > nOutBufferSize)
+        return -1;
+
+    for (int i = nPathLength - 1, j = 0; i >= 0; --i, ++j)
+        pOutBuffer[j] = vPath[i];
+
+    return nPathLength;
 }
