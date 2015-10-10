@@ -1,6 +1,5 @@
 #pragma once
 
-#include "graph.hpp"
 #include "priority_queue.hpp"
 #include <algorithm>
 #include <unordered_map>
@@ -8,35 +7,16 @@
 
 
 /*
- * Fill the output buffer with path indices as they appear in `pMap`,
- * excluding the start position.
+ * Build the output buffer from the given `vPath` as per specifications.
  */
-void BuildOutputBuffer(const int nMapWidth, int* pOutBuffer,
-                       const std::vector<Node*>& vPath);
+void BuildOutputBuffer(int* pOutBuffer, const std::vector<int>& vPath);
 
 /*
- * Connect all traversable nodes with their traversable neighbours.
- */
-void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
-                       std::vector<std::vector<Node*>>& vNodes);
-
-/*
- * Create the initial nodes based on input originally given to `FindPath`.
+ * Convert (0-based) map coordinates to the corresponing array node index.
  *
- * @return: Start and target node pair.
+ * @return The corresponding index in `pMap`.
  */
-std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
-                                    const int nMapWidth,
-                                    const int nMapHeight, const int nStartX,
-                                    const int nStartY,
-                                    const int nTargetX, const int nTargetY,
-                                    std::vector<std::vector<Node*>>& vNodes);
-
-/*
- * Delete all the nodes.
- */
-void DeleteNodes(const int nMapWidth, const int nMapHeight,
-                 std::vector<std::vector<Node*>>& vNodes);
+int CoordToNode(const int nX, const int nY, const int nMapWidth);
 
 /*
  * Find a path from the given start position to the given target using A*
@@ -67,16 +47,23 @@ int FindPath(const int nStartX, const int nStartY,
              const int nMapHeight, int* pOutBuffer, const int nOutBufferSize);
 
 /*
- * Heuristic estimate for cost of distance between `pFrom` and `pTo`.
+ * Heuristic estimate for cost of distance between nodes `nFrom` and `nTo`.
  *
  * @return: The Manhattan distance between the nodes.
  */
-int Heuristic(const Node* pFrom, const Node* pTo);
+int Heuristic(const int nFrom, const int nTo, const int nMapWidth);
+
+/*
+ * Convert the given node index to coordinates on the map.
+ *
+ * @return A pair of 0-based coordinates corresponding to the map position.
+ */
+std::pair<int, int> NodeToCoord(const int nNode, const int nMapWidth);
 
 /*
  * Reconstruct the taken path by backtracking.
  *
  * @return: The reconstructed path.
  */
-std::vector<Node*> ReconstructPath(std::unordered_map<Node*, Node*>& mCameFrom,
-                                   Node* pStart, Node* pTarget);
+std::vector<int> ReconstructPath(std::unordered_map<int, int>& mCameFrom,
+                                 const int nStart, const int nTarget);

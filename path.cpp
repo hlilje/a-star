@@ -1,72 +1,16 @@
 #include "path.hpp"
 
+typedef std::pair<int, int> Node;
 
-void BuildOutputBuffer(const int nMapWidth, int* pOutBuffer,
-                       const std::vector<Node*>& vPath) {
+
+void BuildOutputBuffer(int* pOutBuffer, const std::vector<int>& vPath) {
     // Start node not part of resulting path
-    for (int i = 1; i < (int) vPath.size(); ++i) {
-        Node* pNode = vPath[i];
-        pOutBuffer[i - 1] = (pNode->nY * nMapWidth) + pNode->nX;
-    }
+    for (std::size_t i = 1; i < vPath.size(); ++i)
+        pOutBuffer[i - 1] = vPath[i];
 }
 
-void ConnectNeighbours(const int nMapWidth, const int nMapHeight,
-                       std::vector<std::vector<Node*>>& vNodes) {
-    for (int i = 0; i < nMapHeight; ++i) {
-        for (int j = 0; j < nMapWidth; ++j) {
-            if (vNodes[i][j]->bBlocked) {
-                continue;
-            }
-
-            int mod[8] = {-1, 0, 1, 0, 0, -1, 0, 1}; // (x, y) pairs
-            for (int k = 0; k < 8; k += 2) {
-                int new_x = j + mod[k];
-                int new_y = i + mod[k + 1];
-                if ((new_x >= 0) && (new_x < nMapWidth) && (new_y >= 0) &&
-                    (new_y < nMapHeight)) {
-                    if (!vNodes[new_y][new_x]->bBlocked)
-                        vNodes[i][j]->vEdges.push_back(vNodes[new_y][new_x]);
-                }
-            }
-        }
-    }
-}
-
-std::pair<Node*, Node*> CreateNodes(const unsigned char* pMap,
-                                    const int nMapWidth,
-                                    const int nMapHeight, const int nStartX,
-                                    const int nStartY,
-                                    const int nTargetX, const int nTargetY,
-                                    std::vector<std::vector<Node*>>& vNodes) {
-    Node* pStart = new Node(nStartX, nStartY, false);
-    Node* pTarget = new Node(nTargetX, nTargetY, false);
-
-    for (int i = 0; i < nMapHeight; ++i) {
-        int nStart = i * nMapWidth;
-        int nY = i;
-        for (int j = nStart; j < nStart + nMapWidth; ++j) {
-            int nX = j % nMapWidth;
-            Node* nNode;
-            if ((nX == pStart->nX) && (nY == pStart->nY))
-                nNode = pStart;
-            else if ((nX == pTarget->nX) && (nY  == pTarget->nY))
-                nNode = pTarget;
-            else
-                nNode = new Node(nX, nY, !pMap[j]);
-            vNodes[nY][nX] = nNode;
-        }
-    }
-
-    return std::pair<Node*, Node*>(pStart, pTarget);
-}
-
-void DeleteNodes(const int nMapWidth, const int nMapHeight,
-                 std::vector<std::vector<Node*>>& vNodes) {
-    for (int i = 0; i < nMapHeight; ++i) {
-        for (int j = 0; j < nMapWidth; ++j) {
-            delete vNodes[i][j];
-        }
-    }
+int CoordToNode(const int nX, const int nY, const int nMapWidth) {
+    return nY * nMapWidth + nX;
 }
 
 int FindPath(const int nStartX, const int nStartY,
@@ -76,76 +20,80 @@ int FindPath(const int nStartX, const int nStartY,
     if ((nStartX == nTargetX) && (nStartY == nTargetY))
         return -1;
 
-    std::vector<std::vector<Node*>> vNodes(nMapHeight,
-                                           std::vector<Node*>(nMapWidth));
+    PriorityQueue<int> sFringe;             // Tentative nodes
+    std::unordered_map<int, int> mCameFrom; // Navigated nodes
+    std::unordered_map<int, int> mCost;     // Cost so far
 
-    std::pair<Node*, Node*> pStartTarget = CreateNodes(pMap, nMapWidth,
-                                                       nMapHeight, nStartX,
-                                                       nStartY, nTargetX,
-                                                       nTargetY, vNodes);
-    ConnectNeighbours(nMapWidth, nMapHeight, vNodes);
+    int nStart = CoordToNode(nStartX, nStartY, nMapWidth);
+    int nTarget = CoordToNode(nTargetX, nTargetY, nMapWidth);
 
-    Node* pStart = pStartTarget.first;
-    Node* pTarget = pStartTarget.second;
-
-    PriorityQueue<Node*> sFringe;               // Tentative nodes
-    std::unordered_map<Node*, Node*> mCameFrom; // Navigated nodes
-    std::unordered_map<Node*, int> mCost;       // Cost so far
-
-    sFringe.put(pStart, 0);
-    mCost[pStart] = 0;
+    sFringe.put(nStart, 0);
+    mCost[nStart] = 0;
 
     bool found = false;
+    int mod[8] = {-1, 0, 1, 0, 0, -1, 0, 1}; // (x, y) pairs
     while (!sFringe.empty()) {
-        Node* pCurrent = sFringe.get(); // Node with lowest cost
+        // TODO: Avoid unnecessary coordinates/index conversions
+        int nCurrent = sFringe.get(); // Node with lowest cost
+        Node nCurrentNode = NodeToCoord(nCurrent, nMapWidth);
 
-        if (pCurrent == pTarget) {
+        if (nCurrent == nTarget) {
             found = true;
             break;
         }
 
-        for (Node* pNext : pCurrent->vEdges) {
-            // Distance to neighbours always 1
-            int nNewScore = mCost[pCurrent] + 1;
-            if (!mCost.count(pNext) || nNewScore < mCost[pNext]) {
-                int nPriority = nNewScore + Heuristic(pNext, pTarget);
-                mCost[pNext] = nNewScore;
-                sFringe.put(pNext, nPriority);
-                mCameFrom[pNext] = pCurrent;
+        // Add neighbours to the queue
+        for (int k = 0; k < 8; k += 2) {
+            int nNewX = nCurrentNode.first + mod[k];
+            int nNewY = nCurrentNode.second + mod[k + 1];
+            int nNeighbour = CoordToNode(nNewX, nNewY, nMapWidth);
+            // Check if valid index and not blocked
+            if ((nNewX >= 0) && (nNewX < nMapWidth) && (nNewY >= 0) &&
+                (nNewY < nMapHeight) && pMap[nNeighbour]) {
+                // Distance to neighbours always 1
+                int nNewScore = mCost[nCurrent] + 1;
+                if (!mCost.count(nNeighbour) ||
+                    nNewScore < mCost[nNeighbour]) {
+                    int nPriority = nNewScore + Heuristic(nNeighbour, nTarget,
+                                                          nMapWidth);
+                    mCost[nNeighbour] = nNewScore;
+                    sFringe.put(nNeighbour, nPriority);
+                    mCameFrom[nNeighbour] = nCurrent;
+                }
             }
         }
     }
 
-    if (!found) {
-        DeleteNodes(nMapWidth, nMapHeight, vNodes);
-        return -1;
-    }
+    if (!found) return -1;
 
-    std::vector<Node*> vPath = ReconstructPath(mCameFrom, pStart, pTarget);
-    if ((int) vPath.size() - 1 > nOutBufferSize) {
-        DeleteNodes(nMapWidth, nMapHeight, vNodes);
-        return -1;
-    }
+    std::vector<int> vPath = ReconstructPath(mCameFrom, nStart, nTarget);
+    if ((int) vPath.size() - 1 > nOutBufferSize) return -1;
 
-    BuildOutputBuffer(nMapWidth, pOutBuffer, vPath);
-    DeleteNodes(nMapWidth, nMapHeight, vNodes);
+    BuildOutputBuffer(pOutBuffer, vPath);
 
     return vPath.size() - 1; // Excluding start node
 }
 
-int Heuristic(const Node* pFrom, const Node* pTo) {
-    return std::abs(pFrom->nX - pTo->nX) + std::abs(pFrom->nY - pTo->nY);
+int Heuristic(const int nFrom, const int nTo, const int nMapWidth) {
+    Node nFromNode = NodeToCoord(nFrom, nMapWidth);
+    Node nToNode = NodeToCoord(nTo, nMapWidth);
+    return std::abs(nFromNode.first - nToNode.first) +
+                    std::abs(nFromNode.second - nToNode.second);
 }
 
-std::vector<Node*> ReconstructPath(std::unordered_map<Node*, Node*>& mCameFrom,
-                                   Node* pStart, Node* pTarget) {
-    std::vector<Node*> vPath;
-    Node* pCurrent = pTarget;
-    vPath.push_back(pCurrent);
+Node NodeToCoord(const int nNode, const int nMapWidth) {
+    return Node(nNode % nMapWidth, nNode / nMapWidth);
+}
 
-    while (pCurrent != pStart) {
-        pCurrent = mCameFrom[pCurrent];
-        vPath.push_back(pCurrent);
+std::vector<int> ReconstructPath(std::unordered_map<int, int>& mCameFrom,
+                                 const int nStart, const int nTarget) {
+    std::vector<int> vPath;
+    int nCurrent = nTarget;
+    vPath.push_back(nCurrent);
+
+    while (nCurrent != nStart) {
+        nCurrent = mCameFrom[nCurrent];
+        vPath.push_back(nCurrent);
     }
 
     std::reverse(vPath.begin(), vPath.end());
