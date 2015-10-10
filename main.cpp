@@ -3,10 +3,11 @@
 
 int main() {
     TestEdgeCases();
-    TestInvalidPath();
     TestInvalidLongPath();
-    TestValidPath();
+    TestInvalidPath();
     TestValidLongPath();
+    TestValidOnePath();
+    TestValidPath();
 
     return 0;
 }
