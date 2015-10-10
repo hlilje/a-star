@@ -12,7 +12,7 @@ int FindPath(const int nStartX, const int nStartY,
              const unsigned char* pMap, const int nMapWidth,
              const int nMapHeight, int* pOutBuffer, const int nOutBufferSize) {
     if ((nStartX == nTargetX) && (nStartY == nTargetY))
-        return -1;
+        return 0;
 
     PriorityQueue<int> sFringe;             // Tentative nodes
     std::unordered_map<int, int> mCameFrom; // Navigated nodes

@@ -6,7 +6,7 @@ void TestEdgeCases() {
     int pOutBuffer[10];
 
     int nRes = FindPath(0, 0, 0, 0, pMap, 1, 1, pOutBuffer, 10);
-    assert(nRes == -1); // Question of definition
+    assert(nRes == 0); // Question of definition
 
     unsigned char pMap2[] = {
         1, 1, 1,
