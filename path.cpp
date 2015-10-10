@@ -36,9 +36,9 @@ int FindPath(const int nStartX, const int nStartY,
         }
 
         // Add neighbours to the queue
-        for (int k = 0; k < 8; k += 2) {
-            int nNewX = nCurrentNode.first + mod[k];
-            int nNewY = nCurrentNode.second + mod[k + 1];
+        for (int i = 0; i < 8; i += 2) {
+            int nNewX = nCurrentNode.first + mod[i];
+            int nNewY = nCurrentNode.second + mod[i + 1];
             int nNeighbour = CoordToNode(nNewX, nNewY, nMapWidth);
             // Check if valid index and not blocked
             if ((nNewX >= 0) && (nNewX < nMapWidth) && (nNewY >= 0) &&
@@ -85,10 +85,10 @@ int ReconstructPath(const int nStart, const int nTarget,
     }
 
     int nPathLength = vPath.size() - 1; // Excluding start node
-    if (nPathLength > nOutBufferSize)
-        return -1;
 
-    for (int i = nPathLength - 1, j = 0; i >= 0; --i, ++j)
+    // Store as much of the path as possible
+    for (int i = nPathLength - 1, j = 0; (i >= 0) && (j < nOutBufferSize);
+         --i, ++j)
         pOutBuffer[j] = vPath[i];
 
     return nPathLength;

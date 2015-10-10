@@ -14,8 +14,8 @@ int CoordToNode(const int nX, const int nY, const int nMapWidth);
 
 /*
  * Find a path from the given start position to the given target using A*
- * search. If the resulting path is longer than the output buffer, it is
- * considered a failure.
+ * search. If the resulting path is longer than the output buffer, as many
+ * nodes as possible will be stored.
  *
  * @param nStartX, nStartY:      0-based coordinates of the start position.
  * @param nTargetX, nTargetY:    0-based coordinates of the target position.

@@ -2,17 +2,23 @@
 
 
 void TestEdgeCases() {
-    unsigned char pMap[] = {1};
+    unsigned char pMap[] = {1}; // Single node
     int pOutBuffer[10];
 
     int nRes = FindPath(0, 0, 0, 0, pMap, 1, 1, pOutBuffer, 10);
-    assert(nRes == -1);
+    assert(nRes == -1); // Question of definition
 
-    unsigned char pMap2[] = {1, 1, 1, 1, 1, 1};
-    int pOutBuffer2[1];
+    unsigned char pMap2[] = {
+        1, 1, 1,
+        1, 1, 1
+    };
+    int pOutBuffer2[2]; // Too small buffer
 
-    nRes = FindPath(0, 0, 2, 1, pMap2, 3, 2, pOutBuffer2, 0);
-    assert(nRes == -1);
+    nRes = FindPath(0, 0, 2, 1, pMap2, 3, 2, pOutBuffer2, 2);
+    assert(nRes == 3);
+
+    assert(pOutBuffer2[0] == 1);
+    assert(pOutBuffer2[1] == 2);
 }
 
 void TestInvalidPath() {
