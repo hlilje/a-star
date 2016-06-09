@@ -5,20 +5,23 @@
 
 
 template<typename T, typename N>
-bool PriorityQueue<T, N>::empty() {
+bool PriorityQueue<T, N>::Empty() const
+{
     return pElements.empty();
 }
 
 template<typename T, typename N>
-T PriorityQueue<T, N>::get() {
-    T best_item = pElements.top().second;
+T PriorityQueue<T, N>::Get()
+{
+    T BestItem = pElements.top().second;
     pElements.pop();
-    return best_item;
+    return BestItem;
 }
 
 template<typename T, typename N>
-void PriorityQueue<T, N>::put(T tItem, N nPriority) {
-    pElements.emplace(nPriority, tItem);
+void PriorityQueue<T, N>::Put( const T Item, const N nPriority )
+{
+    pElements.emplace( nPriority, Item );
 }
 
-#endif
+#endif // PRIORITY_QUEUE

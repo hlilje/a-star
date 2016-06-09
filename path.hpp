@@ -1,19 +1,15 @@
-#pragma once
+#ifndef PATHFIND_H
+#define PATHFIND_H
 
 #include "priority_queue.hpp"
 #include <unordered_map>
 #include <vector>
 
 
-/*
- * Convert (0-based) map coordinates to the corresponing array node index.
- *
- * @return The corresponding index in `pMap`.
- */
-int CoordToNode(const int nX, const int nY, const int nMapWidth);
+int CoordToNode( const int nX, const int nY, const int nMapWidth );
 
 /*
- * Find a path from the given start position to the given target using A*
+ * Finds a path from the given start position to the given target using A*
  * search. If the resulting path is longer than the output buffer, as many
  * nodes as possible will be stored.
  *
@@ -35,33 +31,16 @@ int CoordToNode(const int nX, const int nY, const int nMapWidth);
  * @return:                      The length of the shortest path between Start
  *                               and Target, or −1 if no such path exists.
  */
-int FindPath(const int nStartX, const int nStartY,
-             const int nTargetX, const int nTargetY,
-             const unsigned char* pMap, const int nMapWidth,
-             const int nMapHeight, int* pOutBuffer, const int nOutBufferSize);
+int FindPath( const int nStartX, const int nStartY,
+              const int nTargetX, const int nTargetY,
+              const unsigned char* pMap, const int nMapWidth,
+              const int nMapHeight, int* pOutBuffer, const int nOutBufferSize );
 
-/*
- * Heuristic estimate for cost of distance between nodes `nFrom` and `nTo`.
- *
- * @return: The Manhattan distance between the nodes.
- */
-int Heuristic(const int nFromX, const int nFromY, const int nToX,
-              const int nToY);
+int Heuristic( const int nFromX, const int nFromY, const int nToX, const int nToY );
 
-/*
- * Convert the given node index to coordinates on the map.
- *
- * @return A pair of 0-based coordinates corresponding to the map position.
- */
-std::pair<int, int> NodeToCoord(const int nNode, const int nMapWidth);
+std::pair<int, int> NodeToCoord( const int nNode, const int nMapWidth );
 
-/*
- * Reconstruct the taken path by backtracking and storing it in `pOutBuffer`.
- *
- * @return: The length of the taken path (excluding start node and including
- *          target node). If the path does not fit in `pOutBuffer`, -1 is
- *          returned.
- */
-int ReconstructPath(const int nStart, const int nTarget,
-                    const int nOutBufferSize, int* pOutBuffer,
-                    std::unordered_map<int, int>& mCameFrom);
+int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSize,
+                     int* pOutBuffer, std::unordered_map<int, int>& CameFrom );
+
+#endif // PATHFIND_H

@@ -1,7 +1,8 @@
 #include "test.hpp"
 
 
-int main() {
+int main()
+{
     TestEdgeCases();
     TestInvalidLongPath();
     TestInvalidPath();
