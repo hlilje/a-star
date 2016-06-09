@@ -1,4 +1,5 @@
 #include "path.hpp"
+#include <cmath>
 #include <queue>
 #include <vector>
 
@@ -24,22 +25,22 @@ int Heuristic( const int nFromX, const int nFromY, const int nToX, const int nTo
 int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSize,
                      int* pOutBuffer, std::unordered_map<int, int>& CameFrom )
 {
-    std::vector<int> vPath;
+    std::vector<int> Path;
     int nCurrent = nTarget;
-    vPath.emplace_back( nCurrent );
+    Path.emplace_back( nCurrent );
 
     while ( nCurrent != nStart )
     {
         nCurrent = CameFrom[nCurrent];
-        vPath.emplace_back( nCurrent );
+        Path.emplace_back( nCurrent );
     }
 
-    const int nPathLength = vPath.size() - 1; // Excluding start node
+    const int nPathLength = Path.size() - 1; // Excluding start node
 
     for ( int i = nPathLength - 1, j = 0; ( i >= 0 ) && ( j < nOutBufferSize );
           --i, ++j )
     {
-        pOutBuffer[j] = vPath[i];
+        pOutBuffer[j] = Path[i];
     }
 
     return nPathLength;
@@ -47,16 +48,16 @@ int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSi
 
 int FindPath( const int nStartX, const int nStartY,
               const int nTargetX, const int nTargetY,
-              const unsigned char* pMap, const int nMapWidth,
-              const int nMapHeight, int* pOutBuffer, const int nOutBufferSize )
+              const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
+              int* pOutBuffer, const int nOutBufferSize )
 {
     if ( ( nStartX == nTargetX ) && ( nStartY == nTargetY ) )
     {
         return 0;
     }
 
-    std::priority_queue<PQElement, std::vector<PQElement>,
-                        std::greater<PQElement>> Fringe;
+    std::priority_queue< PQElement, std::vector<PQElement>,
+                         std::greater<PQElement> > Fringe;
     std::unordered_map<int, int> CameFrom;
     std::unordered_map<int, int> Cost;
 
@@ -86,17 +87,17 @@ int FindPath( const int nStartX, const int nStartY,
             const int nNewY      = nCurrentNode.second + pMod[i + 1];
             const int nNeighbour = CoordToNode( nNewX, nNewY, nMapWidth );
 
-            if ( ( nNewX >= 0 ) && ( nNewX < nMapWidth ) && ( nNewY >= 0 ) &&
-                 ( nNewY < nMapHeight ) && pMap[nNeighbour] )
+            if ( ( nNewX >= 0 ) && ( nNewX < nMapWidth ) &&
+                 ( nNewY >= 0 ) && ( nNewY < nMapHeight ) && pMap[nNeighbour] )
             {
                 const int nNewScore = Cost[nCurrent] + 1;
-                if ( !Cost.count( nNeighbour ) || nNewScore < Cost[nNeighbour] )
+                if ( Cost.find( nNeighbour ) == Cost.end() || nNewScore < Cost[nNeighbour] )
                 {
                     const int nPriority = nNewScore + Heuristic( nNewX, nNewY,
                                                                  nTargetX, nTargetY );
+                    CameFrom[nNeighbour] = nCurrent;
                     Cost[nNeighbour] = nNewScore;
                     Fringe.emplace( nPriority, nNeighbour );
-                    CameFrom[nNeighbour] = nCurrent;
                 }
             }
         }
