@@ -11,6 +11,40 @@ int CoordToNode( const int nX, const int nY, const int nMapWidth )
     return nY * nMapWidth + nX;
 }
 
+Node NodeToCoord( const int nNode, const int nMapWidth )
+{
+    return Node( nNode % nMapWidth, nNode / nMapWidth );
+}
+
+int Heuristic( const int nFromX, const int nFromY, const int nToX, const int nToY )
+{
+    return std::abs( nFromX - nToX ) + std::abs( nFromY - nToY );
+}
+
+int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSize,
+                     int* pOutBuffer, std::unordered_map<int, int>& CameFrom )
+{
+    std::vector<int> vPath;
+    int nCurrent = nTarget;
+    vPath.emplace_back( nCurrent );
+
+    while ( nCurrent != nStart )
+    {
+        nCurrent = CameFrom[nCurrent];
+        vPath.emplace_back( nCurrent );
+    }
+
+    const int nPathLength = vPath.size() - 1; // Excluding start node
+
+    for ( int i = nPathLength - 1, j = 0; ( i >= 0 ) && ( j < nOutBufferSize );
+          --i, ++j )
+    {
+        pOutBuffer[j] = vPath[i];
+    }
+
+    return nPathLength;
+}
+
 int FindPath( const int nStartX, const int nStartY,
               const int nTargetX, const int nTargetY,
               const unsigned char* pMap, const int nMapWidth,
@@ -21,7 +55,8 @@ int FindPath( const int nStartX, const int nStartY,
         return 0;
     }
 
-    std::priority_queue<PQElement, std::vector<PQElement>, std::greater<PQElement>> Fringe;
+    std::priority_queue<PQElement, std::vector<PQElement>,
+                        std::greater<PQElement>> Fringe;
     std::unordered_map<int, int> CameFrom;
     std::unordered_map<int, int> Cost;
 
@@ -57,7 +92,8 @@ int FindPath( const int nStartX, const int nStartY,
                 const int nNewScore = Cost[nCurrent] + 1;
                 if ( !Cost.count( nNeighbour ) || nNewScore < Cost[nNeighbour] )
                 {
-                    const int nPriority = nNewScore + Heuristic( nNewX, nNewY, nTargetX, nTargetY );
+                    const int nPriority = nNewScore + Heuristic( nNewX, nNewY,
+                                                                 nTargetX, nTargetY );
                     Cost[nNeighbour] = nNewScore;
                     Fringe.emplace( nPriority, nNeighbour );
                     CameFrom[nNeighbour] = nCurrent;
@@ -72,37 +108,4 @@ int FindPath( const int nStartX, const int nStartY,
     }
 
     return ReconstructPath( nStart, nTarget, nOutBufferSize, pOutBuffer, CameFrom );
-}
-
-int Heuristic( const int nFromX, const int nFromY, const int nToX, const int nToY )
-{
-    return std::abs( nFromX - nToX ) + std::abs( nFromY - nToY );
-}
-
-Node NodeToCoord( const int nNode, const int nMapWidth )
-{
-    return Node( nNode % nMapWidth, nNode / nMapWidth );
-}
-
-int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSize,
-                     int* pOutBuffer, std::unordered_map<int, int>& CameFrom )
-{
-    std::vector<int> vPath;
-    int nCurrent = nTarget;
-    vPath.emplace_back( nCurrent );
-
-    while ( nCurrent != nStart )
-    {
-        nCurrent = CameFrom[nCurrent];
-        vPath.emplace_back( nCurrent );
-    }
-
-    const int nPathLength = vPath.size() - 1; // Excluding start node
-
-    for ( int i = nPathLength - 1, j = 0; ( i >= 0 ) && ( j < nOutBufferSize ); --i, ++j )
-    {
-        pOutBuffer[j] = vPath[i];
-    }
-
-    return nPathLength;
 }

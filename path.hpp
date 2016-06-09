@@ -6,6 +6,13 @@
 
 int CoordToNode( const int nX, const int nY, const int nMapWidth );
 
+std::pair<int, int> NodeToCoord( const int nNode, const int nMapWidth );
+
+int Heuristic( const int nFromX, const int nFromY, const int nToX, const int nToY );
+
+int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSize,
+                     int* pOutBuffer, std::unordered_map<int, int>& CameFrom );
+
 /*
  * Finds a path from the given start position to the given target using A*
  * search. If the resulting path is longer than the output buffer, as many
@@ -33,12 +40,5 @@ int FindPath( const int nStartX, const int nStartY,
               const int nTargetX, const int nTargetY,
               const unsigned char* pMap, const int nMapWidth,
               const int nMapHeight, int* pOutBuffer, const int nOutBufferSize );
-
-int Heuristic( const int nFromX, const int nFromY, const int nToX, const int nToY );
-
-std::pair<int, int> NodeToCoord( const int nNode, const int nMapWidth );
-
-int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSize,
-                     int* pOutBuffer, std::unordered_map<int, int>& CameFrom );
 
 #endif // PATH_HPP
