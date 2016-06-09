@@ -1,6 +1,9 @@
 #include "path.hpp"
+#include <queue>
+#include <vector>
 
-using Node = std::pair<int, int>;
+using PQElement = std::pair<int, int>; // <prio, value>
+using Node      = std::pair<int, int>;
 
 
 int CoordToNode( const int nX, const int nY, const int nMapWidth )
@@ -18,22 +21,23 @@ int FindPath( const int nStartX, const int nStartY,
         return 0;
     }
 
-    PriorityQueue<int>           Fringe;
+    std::priority_queue<PQElement, std::vector<PQElement>, std::greater<PQElement>> Fringe;
     std::unordered_map<int, int> CameFrom;
     std::unordered_map<int, int> Cost;
 
     const int nStart  = CoordToNode( nStartX, nStartY, nMapWidth );
     const int nTarget = CoordToNode( nTargetX, nTargetY, nMapWidth );
 
-    Fringe.Put( nStart, 0 );
+    Fringe.emplace( 0, nStart );
     Cost[nStart] = 0;
 
     bool bFound = false;
     const int pMod[8] = { -1, 0, 1, 0, 0, -1, 0, 1 }; // (x, y) pairs
-    while ( !Fringe.Empty() )
+    while ( !Fringe.empty() )
     {
-        const int nCurrent      = Fringe.Get();
+        const int nCurrent      = Fringe.top().second;
         const Node nCurrentNode = NodeToCoord( nCurrent, nMapWidth );
+        Fringe.pop();
 
         if ( nCurrent == nTarget )
         {
@@ -55,7 +59,7 @@ int FindPath( const int nStartX, const int nStartY,
                 {
                     const int nPriority = nNewScore + Heuristic( nNewX, nNewY, nTargetX, nTargetY );
                     Cost[nNeighbour] = nNewScore;
-                    Fringe.Put( nNeighbour, nPriority );
+                    Fringe.emplace( nPriority, nNeighbour );
                     CameFrom[nNeighbour] = nCurrent;
                 }
             }
@@ -85,12 +89,12 @@ int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSi
 {
     std::vector<int> vPath;
     int nCurrent = nTarget;
-    vPath.push_back( nCurrent );
+    vPath.emplace_back( nCurrent );
 
     while ( nCurrent != nStart )
     {
         nCurrent = CameFrom[nCurrent];
-        vPath.push_back(nCurrent);
+        vPath.emplace_back( nCurrent );
     }
 
     const int nPathLength = vPath.size() - 1; // Excluding start node

@@ -1,9 +1,7 @@
-#ifndef PATHFIND_H
-#define PATHFIND_H
+#ifndef PATH_HPP
+#define PATH_HPP
 
-#include "priority_queue.hpp"
 #include <unordered_map>
-#include <vector>
 
 
 int CoordToNode( const int nX, const int nY, const int nMapWidth );
@@ -43,4 +41,4 @@ std::pair<int, int> NodeToCoord( const int nNode, const int nMapWidth );
 int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSize,
                      int* pOutBuffer, std::unordered_map<int, int>& CameFrom );
 
-#endif // PATHFIND_H
+#endif // PATH_HPP

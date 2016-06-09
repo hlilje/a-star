@@ -1,4 +1,6 @@
 #include "test.hpp"
+#include "path.hpp"
+#include <cassert>
 
 
 void TestEdgeCases()
