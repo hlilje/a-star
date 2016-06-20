@@ -6,12 +6,12 @@
 
 int CoordToNode( const int nX, const int nY, const int nMapWidth );
 
-std::pair<int, int> NodeToCoord( const int nNode, const int nMapWidth );
+void NodeToCoord( const int nNode, int* const pCoord, const int nMapWidth );
 
 int Heuristic( const int nFromX, const int nFromY, const int nToX, const int nToY );
 
 int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSize,
-                     int* pOutBuffer, std::unordered_map<int, int>& CameFrom );
+                     int* const pOutBuffer, std::unordered_map<int, int>& CameFrom );
 
 /*
  * Finds a path from the given start position to the given target using A*

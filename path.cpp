@@ -4,7 +4,6 @@
 #include <vector>
 
 using PQElement = std::pair<int, int>; // <prio, value>
-using Node      = std::pair<int, int>;
 
 
 int CoordToNode( const int nX, const int nY, const int nMapWidth )
@@ -12,9 +11,10 @@ int CoordToNode( const int nX, const int nY, const int nMapWidth )
     return nY * nMapWidth + nX;
 }
 
-Node NodeToCoord( const int nNode, const int nMapWidth )
+void NodeToCoord( const int nNode, int* const pCoord, const int nMapWidth )
 {
-    return Node( nNode % nMapWidth, nNode / nMapWidth );
+    pCoord[0] = nNode % nMapWidth;
+    pCoord[1] = nNode / nMapWidth;
 }
 
 int Heuristic( const int nFromX, const int nFromY, const int nToX, const int nToY )
@@ -23,16 +23,16 @@ int Heuristic( const int nFromX, const int nFromY, const int nToX, const int nTo
 }
 
 int ReconstructPath( const int nStart, const int nTarget, const int nOutBufferSize,
-                     int* pOutBuffer, std::unordered_map<int, int>& CameFrom )
+                     int* const pOutBuffer, std::unordered_map<int, int>& CameFrom )
 {
     std::vector<int> Path;
     int nCurrent = nTarget;
-    Path.emplace_back( nCurrent );
+    Path.push_back( nCurrent );
 
     while ( nCurrent != nStart )
     {
         nCurrent = CameFrom[nCurrent];
-        Path.emplace_back( nCurrent );
+        Path.push_back( nCurrent );
     }
 
     const int nPathLength = Path.size() - 1; // Excluding start node
@@ -67,13 +67,13 @@ int FindPath( const int nStartX, const int nStartY,
     Fringe.emplace( 0, nStart );
     Cost[nStart] = 0;
 
-    bool bFound = false;
     const int pMod[8] = { -1, 0, 1, 0, 0, -1, 0, 1 }; // (x, y) pairs
+    int pCoord[2]     = { 0, 0 };
+    bool bFound       = false;
     while ( !Fringe.empty() )
     {
-        const int nCurrent      = Fringe.top().second;
-        const Node nCurrentNode = NodeToCoord( nCurrent, nMapWidth );
-        Fringe.pop();
+        const int nCurrent = Fringe.top().second; Fringe.pop();
+        NodeToCoord( nCurrent, pCoord, nMapWidth );
 
         if ( nCurrent == nTarget )
         {
@@ -83,20 +83,20 @@ int FindPath( const int nStartX, const int nStartY,
 
         for ( int i = 0; i < 8; i += 2 )
         {
-            const int nNewX      = nCurrentNode.first + pMod[i];
-            const int nNewY      = nCurrentNode.second + pMod[i + 1];
+            const int nNewX      = pCoord[0] + pMod[i];
+            const int nNewY      = pCoord[1] + pMod[i + 1];
             const int nNeighbour = CoordToNode( nNewX, nNewY, nMapWidth );
 
             if ( ( nNewX >= 0 ) && ( nNewX < nMapWidth ) &&
                  ( nNewY >= 0 ) && ( nNewY < nMapHeight ) && pMap[nNeighbour] )
             {
-                const int nNewScore = Cost[nCurrent] + 1;
-                if ( Cost.find( nNeighbour ) == Cost.end() || nNewScore < Cost[nNeighbour] )
+                const int nNewCost = Cost[nCurrent] + 1;
+                if ( Cost.find( nNeighbour ) == Cost.end() || nNewCost < Cost[nNeighbour] )
                 {
-                    const int nPriority = nNewScore + Heuristic( nNewX, nNewY,
-                                                                 nTargetX, nTargetY );
+                    const int nPriority = nNewCost + Heuristic( nNewX, nNewY,
+                                                                nTargetX, nTargetY );
                     CameFrom[nNeighbour] = nCurrent;
-                    Cost[nNeighbour] = nNewScore;
+                    Cost[nNeighbour] = nNewCost;
                     Fringe.emplace( nPriority, nNeighbour );
                 }
             }
